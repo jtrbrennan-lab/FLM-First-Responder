@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Medic 1</title>
+<meta name="description" content="7-day flashcard study plan for the FLM Medic 1 (MFR) TCCC / Combat Lifesaver course.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Medic 1">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#eceee7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131611" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column, plan list on home, single card with thumb-reach action bar in study. */
+:root {
+  --bg: #eceee7;
+  --surface: #ffffff;
+  --ink: #1c211b;
+  --muted: #5a6355;
+  --line: #d3d8cc;
+  --accent: #4a5b2c;
+  --accent-ink: #ffffff;
+  --must: #b0281f;
+  --got: #2d6a39;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131611;
+    --surface: #1c2019;
+    --ink: #e6e9e0;
+    --muted: #9ba493;
+    --line: #2e3429;
+    --accent: #a9bd7d;
+    --accent-ink: #131611;
+    --must: #ff8f80;
+    --got: #82c890;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131611;
+  --surface: #1c2019;
+  --ink: #e6e9e0;
+  --muted: #9ba493;
+  --line: #2e3429;
+  --accent: #a9bd7d;
+  --accent-ink: #131611;
+  --must: #ff8f80;
+  --got: #82c890;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+h1 { font-size: 2.1rem; line-height: 1; text-transform: uppercase; }
+h2 { font-size: 1.35rem; line-height: 1.1; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Header */
+.top { display: flex; flex-direction: column; gap: 8px; }
+.top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sub { color: var(--muted); font-size: 0.95rem; }
+.countdown {
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.04em;
+  border: 2px solid var(--accent); color: var(--accent); padding: 2px 10px; border-radius: 4px; white-space: nowrap;
+}
+.stats { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.95rem; color: var(--muted); }
+.stats b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--accent);
+  background: var(--accent); color: var(--accent-ink); font-weight: 700; cursor: pointer; text-align: center;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn.miss { background: transparent; border-color: var(--must); color: var(--must); }
+.btn.got { background: var(--got); border-color: var(--got); color: var(--surface); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1 1 180px; }
+
+/* Install prompt */
+.install {
+  display: grid; grid-template-columns: 56px 1fr; gap: 12px 14px; align-items: start;
+  background: var(--surface); border: 1px dashed var(--accent); border-radius: 8px; padding: 14px;
+}
+.install img { width: 56px; height: 56px; border-radius: 13px; display: block; }
+.install .body { display: flex; flex-direction: column; gap: 8px; }
+.install .btn-row .btn { flex: 0 1 auto; min-height: 44px; }
+
+/* Today panel */
+.today {
+  background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--accent);
+  border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+}
+.eyebrow { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+
+/* Filter */
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid var(--accent); border-radius: 8px; overflow: hidden; }
+.seg button { min-height: 44px; border: 0; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.filter { display: flex; flex-direction: column; gap: 6px; }
+.filter p { font-size: 0.9rem; color: var(--muted); }
+
+/* Plan */
+.plan { display: flex; flex-direction: column; gap: 14px; }
+.day { display: flex; flex-direction: column; gap: 6px; }
+.day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 0 2px; }
+.day-head .label { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.day-head .d { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 4.2em; }
+.day.is-today .day-head .d { color: var(--accent); }
+.day-head .t { font-weight: 600; }
+.linkbtn { background: none; border: 0; color: var(--accent); font-weight: 700; cursor: pointer; padding: 6px 2px; white-space: nowrap; }
+.rows { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; }
+.day.is-today .rows { border-color: var(--accent); }
+.row {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+  padding: 12px 14px; background: none; border: 0; border-top: 1px solid var(--line); text-align: left; cursor: pointer; width: 100%;
+}
+.row:first-child { border-top: 0; }
+.row:disabled { cursor: default; opacity: 0.5; }
+.row .name { font-weight: 600; }
+.row .pg { font-size: 0.85rem; color: var(--muted); }
+.row .count { font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.bar { grid-column: 1 / -1; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.bar .k { background: var(--got); }
+.bar .m { background: var(--must); }
+
+.foot { display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+.reset-confirm { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.how { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.foot h3 { font-size: 1.1rem; color: var(--ink); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Class date */
+.date-form { display: flex; flex-direction: column; gap: 6px; }
+.date-form label { font-weight: 600; font-size: 0.95rem; }
+.date-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.date-row input {
+  flex: 1 1 170px; min-height: 48px; padding: 8px 12px; border: 2px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--ink); font: inherit;
+}
+.date-row input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.date-row .btn { flex: 0 1 auto; }
+.err { color: var(--must); font-weight: 600; font-size: 0.95rem; }
+.class-line { display: flex; gap: 4px 10px; align-items: baseline; flex-wrap: wrap; font-size: 0.95rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.class-line b { color: var(--ink); }
+.day-head .dt { font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.day-note { font-size: 0.92rem; color: var(--muted); padding: 0 2px; }
+
+/* Study */
+#study { min-height: 100%; }
+.study-wrap { max-width: 640px; margin: 0 auto; padding: 14px 16px 140px; display: flex; flex-direction: column; gap: 14px; }
+.study-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.deck-name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); text-align: right; }
+.progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 0.2s; }
+.counter { font-size: 0.9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(20, 30, 15, 0.10);
+  padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; cursor: pointer; min-height: 260px;
+}
+.chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chip { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.chip.t-m { border-color: var(--must); color: var(--must); }
+.chip.t-k { border-color: var(--accent); color: var(--accent); }
+.chip.again { background: var(--must); border-color: var(--must); color: var(--surface); }
+.q { font-size: 1.4rem; line-height: 1.25; font-weight: 600; text-wrap: balance; }
+.hint { color: var(--muted); font-size: 0.95rem; }
+.ans { border-top: 2px dashed var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 1.08rem; }
+.ans ul, .ans ol { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 6px; }
+.ans .src { font-size: 0.85rem; color: var(--muted); }
+.actions {
+  position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--line);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.actions-inner { max-width: 640px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.actions-inner .btn { min-height: 56px; font-size: 1.05rem; }
+.actions-inner .wide { grid-column: 1 / -1; }
+.keys { font-size: 0.8rem; color: var(--muted); text-align: center; grid-column: 1 / -1; }
+@media (hover: none) { .keys { display: none; } }
+
+/* Done */
+.done { background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--got); border-radius: 8px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.done .big { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<main id="home" class="wrap" aria-labelledby="title">
+  <header class="top">
+    <div class="top-row">
+      <h1 id="title">Medic 1 Flashcards</h1>
+      <span class="countdown" id="countdown"></span>
+    </div>
+    <p class="sub">A 7-day study plan for the FLM TCCC / Combat Lifesaver Supplement (v2.0, August 2023). 195 cards, each citing its page.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="install" id="install" aria-label="Install this app" hidden></section>
+
+  <section class="today" id="today" aria-label="Today's study set"></section>
+
+  <section class="filter" aria-label="Card filter">
+    <div class="seg" role="group" aria-label="Which cards to study">
+      <button type="button" id="f-all" aria-pressed="true">All cards</button>
+      <button type="button" id="f-must" aria-pressed="false">Must-know only</button>
+    </div>
+    <p>Must-know cards cover the 9 skills-test stations and the numbers you'll be asked for.</p>
+  </section>
+
+  <section class="plan" id="plan" aria-label="Study plan by day"></section>
+
+  <footer class="foot">
+    <h3>How to use it</h3>
+    <ul class="how">
+      <li>Set your class start date. The plan counts back 7 days and highlights each day's set.</li>
+      <li>Read the whole supplement once on Day 1, then work the cards. Answer from memory before you tap, and mark yourself honestly.</li>
+      <li>A missed card comes back a few cards later, and stays in your missed pile until you get it right on the first try in a later round.</li>
+      <li>Practice the skills with your hands, not just in your head, and sleep well the night before class.</li>
+      <li>Your class date and progress are saved in this browser only, so each trainee keeps their own.</li>
+    </ul>
+    <div id="reset-area"><button type="button" class="linkbtn" id="reset">Reset all progress</button></div>
+  </footer>
+</main>
+
+<div id="study" hidden>
+  <div class="study-wrap">
+    <div class="study-top">
+      <button type="button" class="linkbtn" id="back">&larr; Plan</button>
+      <span class="deck-name" id="deck-name"></span>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+    <p class="counter" id="counter" aria-live="polite"></p>
+    <article class="card" id="card" tabindex="0" aria-live="polite">
+      <div class="chips" id="chips"></div>
+      <p class="q" id="q"></p>
+      <p class="hint" id="hint">Tap to show the answer</p>
+      <div class="ans" id="ans" hidden></div>
+    </article>
+  </div>
+  <div class="actions">
+    <div class="actions-inner" id="actions"></div>
+  </div>
+</div>
+
+<main id="done" class="wrap" hidden aria-live="polite">
+  <div class="done" id="done-box"></div>
+</main>
+
+<script>
+const SECTIONS = {
+  intro:  { name: "Intro & Phases of Care", pages: "pp. 6–11" },
+  fund:   { name: "Medical Fundamentals", pages: "pp. 11–15" },
+  hem:    { name: "Hemorrhage", pages: "pp. 16–20" },
+  air:    { name: "Airway", pages: "pp. 21–25" },
+  chest:  { name: "Chest Injuries", pages: "pp. 25–30" },
+  shock:  { name: "Hemorrhagic Shock", pages: "pp. 30–31" },
+  burns:  { name: "Burns", pages: "pp. 31–34" },
+  splint: { name: "Splinting", pages: "pp. 34–41" },
+  meds:   { name: "Battlefield Medications", pages: "pp. 41–43" },
+  move:   { name: "Casualty Movement", pages: "pp. 44–52" },
+  triage: { name: "Triage", pages: "pp. 52–53" },
+  evac:   { name: "TACEVAC & 9-Line", pages: "pp. 54–56" },
+  card:   { name: "TCCC Card", pages: "pp. 57–58" },
+  gear:   { name: "Medic 1 Kit", pages: "p. 59" }
+};
+
+// Day 1 is 7 days before class; Day 7 is the day before.
+const PLAN = [
+  { title: "Read it all, then the basics", sections: ["intro"], note: "Read the whole supplement once, fast, without notes. Then work these cards." },
+  { title: "Fundamentals & hemorrhage", sections: ["fund", "hem"] },
+  { title: "Airway, chest & shock", sections: ["air", "chest", "shock"] },
+  { title: "Burns, splints & meds", sections: ["burns", "splint", "meds"] },
+  { title: "Movement, triage, 9-line & card", sections: ["move", "triage", "evac", "card", "gear"] },
+  { title: "Review everything, missed first", sections: "all" },
+  { title: "Must-know drill, then rest", sections: "all", mustOnly: true, note: "Nothing new today. Drill the must-know cards, pack your Qualification Card, Skills Assessment Sheets and a pen, and get to bed early." }
+];
+
+// t: m = must know, k = know, s = skim. a = text, l = bullet list, o = ordered steps, p = page.
+const RAW = [
+  // ---------- Intro ----------
+  { s: "intro", t: "m", q: `What are the 3 phases of TCCC/CLS care?`, o: [`Care Under Fire (CUF)`, `Tactical Field Care (TFC)`, `Tactical Evacuation Care (TACEVAC)`], p: "10" },
+  { s: "intro", t: "m", q: `Care Under Fire: what's the situation?`, a: `You and the casualty are at the point of injury, taking effective hostile fire, with limited equipment. The best medicine is fire superiority.`, p: "10, 57" },
+  { s: "intro", t: "m", q: `Tactical Field Care: what's the situation?`, a: `No longer taking effective hostile fire (or the injury happened without hostile fire). Equipment is still limited. Start considering TACEVAC.`, p: "10" },
+  { s: "intro", t: "k", q: `TACEVAC covers which two kinds of evacuation?`, l: [`CASEVAC: from the forward edge of battle (e.g. FEBA to BAS); care limited to basic interventions; the aircraft may take fire`, `MEDEVAC: from one point of care to another in theater`], p: "10" },
+  { s: "intro", t: "m", q: `What are the 3 preventable causes of death that TCCC/CLS targets?`, o: [`Hemorrhage from extremity wounds`, `Tension pneumothorax`, `Airway obstruction`], p: "9–10" },
+  { s: "intro", t: "s", q: `From Figure 1, what share of ground-combat deaths came from each preventable cause?`, l: [`Extremity bleeding: 9%`, `Tension pneumothorax: 5%`, `Airway obstruction: 1%`], p: "9" },
+  { s: "intro", t: "k", q: `What share of combat fatalities die before reaching a treatment facility?`, a: `90%. That's why care at the point of injury matters.`, p: "8" },
+  { s: "intro", t: "k", q: `What are the 3 objectives of TCCC/CLS?`, o: [`Treat the casualty`, `Prevent additional casualties`, `Complete the mission`], p: "10" },
+  { s: "intro", t: "k", q: `Whose IFAK do you use first?`, a: `The casualty's own IFAK. Your Medic 1 CLS kit augments it.`, p: "11" },
+  { s: "intro", t: "m", q: `What are the 9 skills-test stations?`, o: [`CAT tourniquet`, `Combat Gauze / hemostatic agent`, `ETD on a peripheral wound`, `Chest seal`, `Decompression needle`, `Apply 3 splints`, `Manage a junctional wound`, `Combat Casualty (TCCC) Card`, `Call in a 9-Line`], a: `Plus a separate carries and drags station.`, p: "7" },
+  { s: "intro", t: "s", q: `When were TCCC guidelines introduced, and who keeps them updated?`, a: `1996, for Special Operations medics. The Committee on TCCC (CoTCCC), set up in 2002, updates them.`, p: "8" },
+  { s: "intro", t: "k", q: `What must you bring to the qualification class?`, a: `Your own Qualification Card, Skills Assessment Sheets, and a pen.`, p: "6" },
+
+  // ---------- Fundamentals ----------
+  { s: "fund", t: "m", q: `What does AVPU stand for?`, a: `A scale for level of consciousness:`, l: [`Alert: fully awake, eyes open on their own`, `Voice: responds in some way when spoken to`, `Pain: responds only to a pain stimulus`, `Unresponsive: no eye, voice or motor response`], p: "12" },
+  { s: "fund", t: "k", q: `Two ways to apply a pain stimulus for AVPU?`, l: [`Sternal rub: knuckles rubbed firmly on the breastbone`, `Brachial pinch`], p: "12" },
+  { s: "fund", t: "m", q: `Normal respiration rate?`, a: `12–20 breaths per minute.`, p: "13, 21" },
+  { s: "fund", t: "m", q: `Normal heart rate (per the supplement)?`, a: `60–80 beats per minute.`, p: "13" },
+  { s: "fund", t: "k", q: `Three ways to describe respiration?`, l: [`Rate: breaths per minute`, `Rhythm: regular or irregular`, `Depth: normal, deep or shallow`], p: "13" },
+  { s: "fund", t: "k", q: `The three common pulse points, and where to find them?`, l: [`Carotid: side of the neck closest to you`, `Femoral: middle of the groin`, `Radial: thumb side of the wrist`], p: "14" },
+  { s: "fund", t: "k", q: `Why don't you check a pulse with your thumb?`, a: `You may feel your own pulse instead of the casualty's. Use the tips of your first two fingers.`, p: "14" },
+  { s: "fund", t: "m", q: `Palpated blood pressure: which pulse first, and what does each mean?`, a: `Start farthest from the heart and work inward:`, l: [`Radial present: at least 80 systolic, "80 over palp" (80/P)`, `No radial, femoral present: 70/P`, `No femoral, carotid present: 60/P`], p: "14–15" },
+  { s: "fund", t: "m", q: `Normal capillary refill time?`, a: `Under 3 seconds (press on the nail bed). Over 3 seconds suggests a circulation problem.`, p: "15" },
+  { s: "fund", t: "k", q: `Skin signs of poor perfusion?`, l: [`Color: pale (bluish means poor oxygenation)`, `Temperature: cool`, `Condition: moist`], a: `Color changes show first in the lips, gums or fingertips.`, p: "15" },
+  { s: "fund", t: "m", q: `How long can brain cells go without oxygen?`, a: `4–6 minutes. That's your window to provide an adequate airway.`, p: "12, 15" },
+  { s: "fund", t: "m", q: `How long do you have to stop a massive, life-threatening bleed?`, a: `60–120 seconds.`, p: "15, 30" },
+  { s: "fund", t: "s", q: `Axial vs appendicular skeleton?`, l: [`Axial: skull, spinal column, rib cage`, `Appendicular: upper and lower extremities (including the scapula) and the pelvic girdle`], a: `206 bones in total.`, p: "11" },
+  { s: "fund", t: "k", q: `The 4 abnormal body functions a CLS must address?`, o: [`Lack of oxygen`, `Life-threatening hemorrhage`, `Shock`, `Infection`], p: "15" },
+  { s: "fund", t: "k", q: `What can cause shock, per the fundamentals section?`, a: `Blood loss, fluid loss from deep burns, pain, and reaction to the sight of a wound or blood.`, p: "15" },
+
+  // ---------- Hemorrhage ----------
+  { s: "hem", t: "m", q: `Most frequent cause of PREVENTABLE death on the battlefield?`, a: `Extremity hemorrhage. It can kill within minutes.`, p: "16" },
+  { s: "hem", t: "m", q: `In combat, which comes first: bleeding or airway?`, a: `Life-threatening bleeding. The airway becomes the main concern once the casualty is moved somewhere safer (Tactical Field Care).`, p: "16" },
+  { s: "hem", t: "m", q: `Arterial vs venous vs capillary bleeding?`, l: [`Arterial: BRIGHT red, spurts with the heartbeat`, `Venous: DARK red, steady even flow`, `Capillary: BRICK red, oozes slowly`], p: "16" },
+  { s: "hem", t: "k", q: `Which bleeds are life-threatening?`, a: `Any arterial bleed, plus some venous bleeds depending on how much and how fast. Slow venous and capillary bleeds are non-life-threatening.`, p: "16" },
+  { s: "hem", t: "k", q: `Extremity vs non-extremity bleeding?`, l: [`Extremity: arms, hands, legs, feet`, `Non-extremity: head, neck, chest, back, abdomen, pelvis`], p: "16" },
+  { s: "hem", t: "k", q: `What is a "compressible" hemorrhage?`, a: `One a pressure dressing can control without a tourniquet.`, p: "16" },
+  { s: "hem", t: "k", q: `Dressing vs bandage?`, l: [`Dressing: absorbent material that covers and protects the wound`, `Bandage: gauze that wraps a body part or dressing, holds dressings and splints in place, and adds pressure`], p: "16–17" },
+  { s: "hem", t: "k", q: `The 5 purposes of a dressing?`, o: [`Promote hemorrhage control`, `Protect the wound from further injury`, `Immobilize soft tissue (large wounds)`, `Protect from contamination`, `Give physical and psychological support`], p: "16–17" },
+  { s: "hem", t: "s", q: `Three pressure-bandage types listed?`, l: [`Cinch Tight: battle dressing + 4" ace wrap + metal S-hook`, `Israeli (ETD) style`, `H-Bandage: battle dressing + 4" ace wrap + plastic H-hook`], p: "17" },
+  { s: "hem", t: "s", q: `Kerlex: pros and cons?`, l: [`Pros: very absorbent, stretches without elastic, sterile, good for packing`, `Cons: loses bulk when wet, snags and catches debris`], p: "17" },
+  { s: "hem", t: "s", q: `Ace wrap: pros and the main con?`, l: [`Pros: quick, pressure over the whole wound, supports sprains and strains`, `Con: can decrease peripheral circulation`], p: "17" },
+  { s: "hem", t: "k", q: `Cravat (triangular bandage): size, pros, con?`, l: [`Size: 40" × 40" × 56"`, `Pros: most versatile ("workhorse of the aid bag"), small pack with safety pins, can be a tourniquet`, `Con: very little absorbency`], p: "17–18" },
+  { s: "hem", t: "m", q: `Treatment for a life-threatening EXTREMITY bleed?`, a: `A tourniquet. The CAT is the tourniquet of choice.`, p: "18" },
+  { s: "hem", t: "m", q: `Treatment for a life-threatening NON-extremity bleed?`, o: [`Direct pressure with a gloved hand`, `Pressure dressing`, `Hemostatic agent`, `Monitor for shock`, `Evacuate to medical personnel`], p: "18" },
+  { s: "hem", t: "m", q: `Where does the CAT go?`, a: `2–3 inches above the wound, over the casualty's clothing.`, p: "18" },
+  { s: "hem", t: "m", q: `The 4 tourniquet rules?`, o: [`Never on a joint (knee, elbow)`, `Write "T" and the time on the casualty's forehead`, `Never cover it; leave it exposed over the uniform`, `If needed, add a second tourniquet proximal to (above) the first`], p: "19" },
+  { s: "hem", t: "m", q: `The 5 tourniquet mistakes?`, o: [`Not using one when you should`, `Using one when you shouldn't`, `Placing it too close to the wound`, `Not tight enough`, `Removing it: once it's been on longer than 2 hours, only medical personnel remove it`], p: "19" },
+  { s: "hem", t: "k", q: `Improvised tourniquet: what material, and what to avoid?`, a: `About 2" wide, like a triangular bandage folded into a cravat. Never rope, wire or string: they cut into flesh.`, p: "18" },
+  { s: "hem", t: "k", q: `Steps for an improvised tourniquet?`, o: [`Tie a strong windlass into the cravat`, `Slide one or two strong rings (e.g. grenade pin rings) on each side`, `Tie it loosely around the limb, 2–3" above the wound`, `Twist the windlass until the bleeding stops`, `Slide a ring onto the windlass and secure it`], p: "18–19" },
+  { s: "hem", t: "m", q: `How do you manage a junctional wound (e.g. groin or armpit)?`, a: `Junctional tourniquets are cumbersome in the field, so combine pressure dressings, hemostatic agents (Combat Gauze) and triangular bandages.`, p: "19" },
+  { s: "hem", t: "m", q: `Hemostatic agent of choice, and what's in it?`, a: `Combat Gauze: sterile gauze impregnated with kaolin, which promotes clotting. It doesn't heat up (unlike QuickClot) and is non-allergenic.`, p: "19–20" },
+  { s: "hem", t: "m", q: `Combat Gauze application steps?`, o: [`Expose the wound and find the source of bleeding`, `Remove pooled blood if possible`, `Pack tightly, directly onto the source; use as many rolls as it takes`, `Hold direct pressure about 3 minutes, or until bleeding stops`, `Reassess; repack or add a second gauze if it fails`, `Leave it in and apply a pressure dressing over the top`, `Transport and monitor; never remove the gauze or dressing`], p: "20" },
+  { s: "hem", t: "m", q: `How long do you hold pressure after packing Combat Gauze?`, a: `About 3 minutes, or until the bleeding stops.`, p: "20" },
+  { s: "hem", t: "m", q: `Treatment for a NON-life-threatening bleed?`, o: [`Direct pressure with a gloved hand`, `Pressure dressing (hemostatic agent if that fails)`, `Monitor for shock`, `Evacuate to medical personnel`], p: "20" },
+  { s: "hem", t: "k", q: `Pressure dressings are used for which two kinds of bleeding?`, l: [`Non-life-threatening extremity bleeding`, `Life-threatening non-extremity bleeding`], p: "20" },
+  { s: "hem", t: "m", q: `Cravat-and-battle-dressing pressure dressing: how is it built?`, a: `2 dressings + 2 bandages:`, l: [`1st dressing covers the whole wound; 1st bandage covers the whole dressing, knot tied to one side, NOT over the wound`, `2nd dressing made small and tight on top; 2nd bandage applies the pressure, knot tied directly over the wound`], p: "20" },
+  { s: "hem", t: "k", q: `What if the second dressing soaks through?`, a: `You may need a tourniquet or a hemostatic agent.`, p: "20" },
+  { s: "hem", t: "k", q: `Cinch Tight / H-Bandage vs the two-dressing method?`, a: `Only one Cinch Tight or H-Bandage is needed, and it's more effective than two dressings and two bandages.`, p: "20" },
+
+  // ---------- Airway ----------
+  { s: "air", t: "m", q: `How do you check responsiveness?`, a: `Gently shake him and ask, "Hey Militiaman, are you OK?" If he can talk, his airway is working. If not, treat him as unresponsive: maintain the airway and call for help.`, p: "21–22" },
+  { s: "air", t: "m", q: `Most common cause of airway obstruction in an unconscious casualty?`, a: `The tongue.`, p: "22–23" },
+  { s: "air", t: "k", q: `Other common causes of airway obstruction?`, a: `Foreign material: broken teeth, vomit, debris.`, p: "22" },
+  { s: "air", t: "k", q: `Best position for airway work, and how do you turn a prone casualty?`, a: `Flat on his back on a firm surface. Roll him as a unit so the body doesn't twist, to protect the spine.`, p: "22" },
+  { s: "air", t: "m", q: `The two safest ways to open an airway in combat, and why?`, a: `Jaw thrust and trauma chin lift. Both can usually be done without extending the neck, which could worsen a spinal injury.`, p: "23" },
+  { s: "air", t: "m", q: `Jaw thrust technique?`, a: `Grasp the angles of the lower jaw with both hands and lift it forward and up. Rest your elbows on the ground. If the lips close, pull the lower lip back with your thumb.`, p: "23" },
+  { s: "air", t: "m", q: `Trauma chin lift technique?`, a: `From the casualty's side (between shoulder and hip, facing his head), use the hand nearest his feet to grasp his teeth or lower jaw with your thumb and first two fingers. Pull the chin forward and slightly toward his feet.`, p: "24" },
+  { s: "air", t: "k", q: `Once the airway is open, what do you do?`, a: `Someone keeps the head positioned to hold it open while you LOOK, LISTEN and FEEL for breathing.`, p: "24" },
+  { s: "air", t: "m", q: `The only airway adjunct for a Combat Lifesaver?`, a: `The nasopharyngeal airway (NPA). It works for conscious and unconscious casualties.`, p: "24" },
+  { s: "air", t: "m", q: `How do you size an NPA?`, a: `Measure from the nose to the earlobe.`, p: "25" },
+  { s: "air", t: "m", q: `NPA insertion steps?`, o: [`Check the nostril for obstructions (fracture, bleeding)`, `Size it: nose to earlobe`, `Lubricate with water-based lubricant`, `Insert, aiming back toward the ear with a slight rotating motion, until the flange rests on the nostril`, `Reassess`], p: "25" },
+  { s: "air", t: "k", q: `When should you use an NPA, and what's its main complication?`, a: `Whenever the casualty can't maintain his own airway (and it's a good idea just in case). Bleeding from insertion is the main complication.`, p: "25" },
+  { s: "air", t: "s", q: `Lateral recovery position: the key moves?`, l: [`Near arm out perpendicular, elbow bent; far arm across the torso`, `Bend the far leg, knee up`, `Pull the far knee and far shoulder to roll him toward you`, `Leave the upper leg bent to stabilize him`], p: "22–23" },
+
+  // ---------- Chest ----------
+  { s: "chest", t: "m", q: `Second leading cause of preventable death on the battlefield?`, a: `Tension pneumothorax.`, p: "25, 28" },
+  { s: "chest", t: "k", q: `Parietal vs visceral pleura?`, l: [`Parietal: lines the inside of the chest wall`, `Visceral: covers the surface of each lung`], a: `Fluid between them creates surface tension that keeps the lung from collapsing.`, p: "26" },
+  { s: "chest", t: "s", q: `How many lobes does each lung have?`, a: `Right: 3 lobes (larger). Left: 2 lobes.`, p: "26" },
+  { s: "chest", t: "k", q: `What runs along the underside of each rib?`, a: `A nerve, an artery and a vein. That's why the needle goes in just ABOVE the 3rd rib.`, p: "25, 29" },
+  { s: "chest", t: "s", q: `What's in the mediastinum?`, a: `The heart, great vessels, trachea and main-stem bronchi.`, p: "26" },
+  { s: "chest", t: "m", q: `Signs of a sucking chest wound?`, l: [`Chest wall wound or bleeding`, `Shortness of breath and fast breathing (tachypnea)`, `Decreased chest wall motion`, `Moist sucking or bubbling sound`], p: "27" },
+  { s: "chest", t: "m", q: `Treatment for a sucking chest wound?`, o: [`Cover it with an occlusive dressing (chest seal)`, `Tape it on all 4 sides`, `Check for an exit wound and seal that too`, `Monitor for tension pneumothorax`, `Evacuate ASAP`], p: "27" },
+  { s: "chest", t: "m", q: `What happens in a tension pneumothorax?`, a: `Air gets into the pleural space but can't escape. Pressure builds, the lung collapses and the mediastinum shifts to the other side, so breathing gets harder and blood flow to the heart drops.`, p: "27" },
+  { s: "chest", t: "m", q: `Early signs of tension pneumothorax?`, l: [`Absent or diminished breath sounds on one side`, `Increasing difficulty breathing`, `Rising breathing rate despite treatment`], p: "28" },
+  { s: "chest", t: "k", q: `Progressive and late signs of tension pneumothorax?`, l: [`Progressive: faster, harder breathing; rising heart rate`, `Late: jugular vein distention (JVD), tracheal deviation, signs of shock`], p: "28" },
+  { s: "chest", t: "m", q: `When do you perform needle decompression?`, a: `On any casualty with penetrating chest trauma and increasing breathing difficulty. Don't wait for the late signs.`, p: "28" },
+  { s: "chest", t: "m", q: `Decompression needle size?`, a: `14 gauge, 3.25 inches long.`, p: "28" },
+  { s: "chest", t: "k", q: `Equipment for needle decompression?`, l: [`Alcohol or betadine swabs`, `Tape`, `14 g × 3.25" decompression needle`], p: "28" },
+  { s: "chest", t: "m", q: `Where does the decompression needle go?`, a: `2nd intercostal space, mid-clavicular line, on the injured side: about 3 finger widths below the collarbone, just above the 3rd rib.`, p: "29" },
+  { s: "chest", t: "m", q: `At what angle do you insert the needle?`, a: `90 degrees, into the pleural space.`, p: "29" },
+  { s: "chest", t: "m", q: `Needle decompression steps?`, o: [`Confirm the need`, `Position of comfort`, `Assemble equipment`, `Find the jugular notch and mid-clavicular line on the injured side`, `Find the 2nd intercostal space`, `Clean the site`, `Insert at 90°, just above the 3rd rib`, `Remove the needle, leave the catheter, listen for a rush of air`, `Tape the catheter in place`, `Monitor breathing; tell him not to dislodge it`], p: "29" },
+  { s: "chest", t: "m", q: `What do you do before needle decompression?`, a: `Treat the chest wound first: apply the occlusive dressing.`, p: "28" },
+  { s: "chest", t: "k", q: `Breathing gets worse again after decompression. What now?`, a: `Reopen the catheter's valve to release pressure, or perform another needle decompression.`, p: "29" },
+  { s: "chest", t: "k", q: `When can the catheter be removed?`, a: `If evacuation requires excessive movement. Cover the puncture with a small dressing.`, p: "29" },
+  { s: "chest", t: "k", q: `The 4 complications of needle decompression?`, l: [`Hemothorax: blood in the pleural space from a punctured vessel`, `Subcutaneous emphysema: trapped air that feels like Rice Krispies under the skin`, `Air embolism: air enters a great vessel`, `Misdiagnosis: can create a pneumothorax`], p: "30" },
+  { s: "chest", t: "k", q: `Why decompress even when you're not sure it's a tension pneumothorax?`, a: `The extra trauma from the needle isn't expected to significantly worsen him if he doesn't have one.`, p: "28" },
+
+  // ---------- Shock ----------
+  { s: "shock", t: "m", q: `The 5 signs of hemorrhagic shock?`, l: [`Heart rate over 100`, `Respirations over 20`, `Capillary refill over 3 seconds`, `Skin: cool, clammy, pale or cyanotic`, `Mental status: restless, disoriented, lethargic or unconscious`], p: "31" },
+  { s: "shock", t: "m", q: `Hemorrhagic shock treatment, in order?`, o: [`Control life-threatening bleeding (the most important step)`, `Maintain the airway`, `Keep him warm to prevent hypothermia`, `Reassess and monitor vitals`, `Evacuate ASAP`], p: "31" },
+  { s: "shock", t: "k", q: `Average adult blood volume, and how much loss is life-threatening?`, a: `5–6 liters. Losing 25–40% is life-threatening.`, p: "30" },
+  { s: "shock", t: "k", q: `The 3 parts of the cardiovascular system that can fail in shock?`, l: [`Volume: the blood`, `Container: arteries, veins, capillaries`, `Pump: the heart`], p: "30" },
+  { s: "shock", t: "k", q: `The 3 causes of hemorrhagic shock?`, l: [`External blood loss`, `Internal blood loss into a body cavity or tissue (e.g. the thigh with a femur fracture)`, `Plasma loss from severe burns`], p: "30" },
+  { s: "shock", t: "m", q: `Below what core temperature does hypothermia set in?`, a: `95°F. After massive blood loss the body can't regulate its own temperature.`, p: "30" },
+  { s: "shock", t: "k", q: `5 ways to prevent hypothermia?`, o: [`Minimize exposure to the elements`, `Keep protective gear on if feasible`, `Replace wet clothing with dry`, `Wrap him in blankets, poncho, poncho liner or sleeping system`, `Add heat if available`], p: "31" },
+  { s: "shock", t: "k", q: `Most common cause of shock on the battlefield?`, a: `Hemorrhagic shock (blood loss). Uncontrolled bleeding and the shock that follows is the #1 cause of preventable battlefield death.`, p: "30" },
+
+  // ---------- Burns ----------
+  { s: "burns", t: "k", q: `The 3 layers of skin?`, l: [`Epidermis: outer layer, no blood vessels`, `Dermis: blood vessels, nerve endings, sweat and oil glands`, `Subcutaneous: elastic and fibrous tissue, fat`], p: "31–32" },
+  { s: "burns", t: "k", q: `Burns are classified by which two things?`, a: `Depth, and extent (% of total body surface area, TBSA). Final judgment of depth waits 48 hours.`, p: "32" },
+  { s: "burns", t: "m", q: `First-degree burn?`, a: `Superficial, epidermis only. Dry, red, painful, and whitens under firm pressure. Heals in about a week.`, p: "32" },
+  { s: "burns", t: "m", q: `Second-degree burn?`, a: `Partial thickness: epidermis destroyed, dermis damaged. Wet or glistening, blisters, intense pain. Heals in 2–3 weeks; fluid loss can be significant.`, p: "32" },
+  { s: "burns", t: "m", q: `Third-degree burn?`, a: `Full thickness, all 3 layers. Dry and leathery; white, yellow, cherry red, brown or charred. Little pain in the center, severe pain around the edges.`, p: "32" },
+  { s: "burns", t: "k", q: `Fourth-degree burn?`, a: `All 3 skin layers plus fat, muscle, bone or organs.`, p: "32" },
+  { s: "burns", t: "k", q: `The 4 primary causes of burns?`, l: [`Thermal`, `Electrical`, `Chemical`, `Radiation`], a: `Thermal is the most common on the modern battlefield.`, p: "32–33" },
+  { s: "burns", t: "k", q: `What makes white phosphorus ("Willy Pete") special?`, a: `It ignites on contact with air and keeps burning until the oxygen is cut off. Fragments can embed in the skin. Burns at about 1500°F.`, p: "33" },
+  { s: "burns", t: "s", q: `Burn temperatures of incendiary weapons?`, l: [`Napalm: 1400–2100°F`, `White phosphorus: 1500°F`, `Thermite: 3600–5400°F`, `Magnesium: 5400°F (hottest)`], p: "33" },
+  { s: "burns", t: "k", q: `Why think about the airway with thermal-weapon burns?`, a: `The very high temperatures can burn the airway. Remember your ABCs and get the Medic III ASAP.`, p: "33" },
+  { s: "burns", t: "k", q: `Why are electrical burns worse than they look?`, a: `Entry and exit wounds may be small, but the current burns a large area along its path inside the body.`, p: "33" },
+  { s: "burns", t: "m", q: `Thermal burn treatment?`, o: [`Stop the burning; don't become a casualty yourself`, `ABCs (watch for airway burns); get the Medic III`, `Remove clothing and jewelry, but not clothing stuck to the burn`, `Loose, dry sterile dressing covering above and below the burn (water gel under a loose dressing is optional)`, `Keep him warm`, `Treat other injuries first; burns can wait`, `Don't pop blisters; give the Combat Pill Pack; evacuate`], p: "33–34" },
+  { s: "burns", t: "m", q: `Electrical burn: first step?`, a: `Stop the current: turn off the power or the main breaker. If you can't, separate him with something nonconductive (wooden broom handle, rope, dry towel, wooden chair).`, p: "34" },
+  { s: "burns", t: "m", q: `Chemical burn treatment?`, o: [`Flush with large amounts of water`, `Brush off dry chemicals (never with your bare hand), away from both of you`, `Known acid: irrigate at least 15 minutes`, `Loose, dry sterile dressing; evacuate`], p: "34" },
+  { s: "burns", t: "k", q: `How do you treat a radiation burn?`, a: `The same as a thermal burn.`, p: "34" },
+  { s: "burns", t: "k", q: `Are skin burns immediately fatal?`, a: `No. Deal with every other life threat first.`, p: "33" },
+
+  // ---------- Splinting ----------
+  { s: "splint", t: "k", q: `Open vs closed fracture?`, l: [`Open: breaks the skin (bone sticks out, or a bullet or fragment goes through)`, `Closed: no skin penetration, though tissue underneath may be damaged`], p: "35" },
+  { s: "splint", t: "m", q: `The 7 signs of a fracture?`, l: [`Deformity`, `Swelling`, `Pain`, `Can't move it, or sharp pain with movement`, `Protruding bone`, `Crepitus (grating sound or feeling)`, `Any injury that suggests one (e.g. GSW)`], p: "35" },
+  { s: "splint", t: "k", q: `The 4 types of splints?`, l: [`Rigid: board, plastic, metal, air splint`, `Formable: SAM, vacuum, pillow, blanket, cardboard, wire ladder`, `Improvised: sticks, branches, tent poles`, `Anatomical: the casualty's own body (legs together, arm to chest, fingers taped together)`], p: "36" },
+  { s: "splint", t: "m", q: `The universal splinting pattern?`, o: [`Control bleeding and treat for shock`, `Check the distal pulse`, `Expose the site; cover any exposed bone ends with a sterile dressing`, `Splint in the position found`, `Pad bony points (elbow, wrist, ankle)`, `Immobilize above and below the fracture`, `Recheck the distal pulse`], p: "36" },
+  { s: "splint", t: "m", q: `When may you straighten a deformed limb?`, a: `Only if it's a closed injury with no distal pulse. Never push an exposed bone back in.`, p: "36" },
+  { s: "splint", t: "k", q: `Not sure it's a fracture?`, a: `Treat it as one.`, p: "36" },
+  { s: "splint", t: "k", q: `Sling vs swath?`, l: [`Sling: bandage hung from the neck to support an arm`, `Swath: band of cloth that further immobilizes the injury`], p: "37" },
+  { s: "splint", t: "k", q: `Fractured jaw?`, a: `Modified Barton bandage that pulls the lower jaw forward, supported on the head (not behind the neck). Never lay him on his back: the airway can obstruct.`, p: "37" },
+  { s: "splint", t: "k", q: `Fractured clavicle (collarbone)?`, a: `Figure-eight bandage. Arm bent across the chest, palm in, thumb up, hand 4" above the elbow. Sling and swath.`, p: "37" },
+  { s: "splint", t: "k", q: `Fractured humerus: what changes with location?`, l: [`Near the shoulder: pad the armpit, bandage the arm to the body`, `Mid upper arm: splint on the outside, wrap to the body, sling`, `Near the elbow: splint in the position found, sling`], a: `Check the distal pulse before and after.`, p: "38" },
+  { s: "splint", t: "k", q: `Fractured forearm?`, a: `Two splints, top and bottom, wrist to elbow. Forearm across the chest, palm in, thumb up. Sling and swath. Pulse before and after.`, p: "38" },
+  { s: "splint", t: "k", q: `Fractured wrist or hand?`, a: `Formable splint in the position of function, fingers exposed. Sling. Check the radial pulse before and after.`, p: "38" },
+  { s: "splint", t: "m", q: `Fractured ribs: the one thing you NEVER do?`, a: `Never wrap a constricting bandage around the chest; it makes breathing harder. Instead, strap the arm on the injured side to the chest (palm flat, thumb up, forearm at 45°) with a swath.`, p: "39" },
+  { s: "splint", t: "k", q: `Fractured pelvis?`, a: `Position of comfort, padding between the legs, a sheet or poncho wrapped snugly around the pelvis, knees and ankles tied together. Pulse before and after.`, p: "39" },
+  { s: "splint", t: "m", q: `Fractured femur?`, a: `Anatomical splint: 4 cravats tie the injured leg to the good one, at the thighs, just above the knees, just below the knees, and a figure-8 at the ankles and feet. Pulse before and after.`, p: "39" },
+  { s: "splint", t: "k", q: `Fractured patella (kneecap)?`, a: `Splint under the whole leg in the position of comfort, padded at least at the knee and ankle. Secure in 4 places: just below the knee, just above the knee, the ankle, the thigh.`, p: "40" },
+  { s: "splint", t: "m", q: `Fractured tibia/fibula?`, a: `SAM splint, stirrup method, on both sides of the lower leg, secured with Kerlex, knee to ankle. Pulse before and after.`, p: "40" },
+  { s: "splint", t: "k", q: `Fractured ankle or foot?`, l: [`Boots on: figure-8 cravat to tie the ankles together`, `Boots off: Kerlex wrap on the ankle, then a figure-8 cravat`], a: `Check the pedal pulse before and after.`, p: "40" },
+  { s: "splint", t: "k", q: `The 4 indications for spinal immobilization?`, l: [`High-speed vehicle crash (over 30 mph)`, `Fall from 2–3× body height`, `Direct blunt trauma to the neck`, `Blast injury`], p: "41" },
+  { s: "splint", t: "k", q: `Spinal immobilization key points?`, l: [`Get to a safe location first`, `Immobilize from head to pelvis`, `Don't block the airway`, `C-collar; long spine board if available`, `Otherwise, prevent unnecessary movement`], p: "41" },
+
+  // ---------- Meds ----------
+  { s: "meds", t: "m", q: `What's in the Combat Pill Pack?`, l: [`Mobic: one 15 mg tablet`, `Tylenol: two 650 mg tablets`, `Moxifloxacin: one 400 mg tablet`], p: "42" },
+  { s: "meds", t: "m", q: `When is the Combat Pill Pack taken?`, a: `Self-administered as soon as possible after sustaining an open wound.`, p: "42" },
+  { s: "meds", t: "k", q: `Why Mobic and Tylenol for pain?`, a: `They don't interfere with clotting or alter mental status, so the casualty can keep fighting. If the wound isn't significantly painful, no medication is needed.`, p: "41" },
+  { s: "meds", t: "m", q: `Who should NOT take Mobic?`, a: `Anyone allergic to aspirin or other NSAIDs. If there's a reaction, watch for throat swelling and airway compromise, maintain ABCs and find the Medic III.`, p: "42" },
+  { s: "meds", t: "k", q: `Battlefield antibiotic and dose?`, a: `Moxifloxacin, one 400 mg tablet daily, given early for all open wounds. If the casualty is unconscious, get the Medic III (IV/IM antibiotics).`, p: "41" },
+  { s: "meds", t: "s", q: `What did the Mogadishu (1993) data show about antibiotics?`, a: `16 of 58 casualties (28%) got wound infections without them. In another study, none of 32 open-wound casualties given antibiotics got infected.`, p: "41" },
+  { s: "meds", t: "m", q: `When is morphine used?`, a: `Only for a CONSCIOUS casualty in severe pain.`, p: "42" },
+  { s: "meds", t: "m", q: `The 7 reasons NOT to give morphine?`, l: [`Serious head injury`, `Altered mental status`, `Unconsciousness`, `Low blood pressure`, `Shock`, `Difficulty breathing`, `Scorpion stings`], p: "42" },
+  { s: "meds", t: "m", q: `Morphine dose and frequency?`, a: `10 mg auto-injector, intramuscular, every 4 hours as needed.`, p: "42" },
+  { s: "meds", t: "k", q: `How do you give a morphine auto-injector?`, o: [`Remove the red safety cap`, `Press the purple end to the thickest part of the thigh or buttocks`, `Hold firmly for 10 seconds, then remove`, `Massage the site to speed absorption (optional)`], p: "42" },
+  { s: "meds", t: "m", q: `How do you document a morphine injection?`, a: `Pin the spent injector to the blouse pocket flap, and write "M" and the time on the casualty's forehead in indelible ink.`, p: "42" },
+  { s: "meds", t: "k", q: `Signs of morphine overdose, and the treatment?`, l: [`Pinpoint pupils`, `Slowed breathing and heart rate`, `Falling blood pressure`, `Cyanosis`, `Stupor or coma`, `Limp muscles`, `Cold, clammy skin`], a: `Treatment: maintain the airway and find a Medic III.`, p: "43" },
+
+  // ---------- Movement ----------
+  { s: "move", t: "k", q: `Most common carry in a hostile environment?`, a: `Fireman's carry. Works for conscious or unconscious casualties and frees one hand for your weapon.`, p: "44" },
+  { s: "move", t: "k", q: `Which carries need a CONSCIOUS casualty?`, l: [`One-man support: minimal injury, walks using you as a crutch`, `Saddleback: able to hold on to you`, `Two-hand seat`, `Four-hand seat: must hold your shoulders`], p: "45, 47" },
+  { s: "move", t: "k", q: `Pack-strap (Hawes) carry?`, a: `Works for an unconscious casualty and keeps his weight lower than the saddleback, with good leverage, but only for moderate distances.`, p: "45" },
+  { s: "move", t: "s", q: `Two-man support carry (SEAL Team 3 carry)?`, a: `Supports the casualty without carrying his full weight. Each rescuer pulls an arm over his shoulder and grips the wrist, free hand around his back.`, p: "46" },
+  { s: "move", t: "s", q: `What's the two-man carry used for?`, a: `Placing a casualty on a litter, or moving short distances.`, p: "46" },
+  { s: "move", t: "k", q: `What are the two-hand and four-hand seat carries best for?`, a: `A conscious casualty with a head or foot injury, over moderate distances, or placing him on a litter.`, p: "47" },
+  { s: "move", t: "s", q: `Fore-and-aft carry: when, and its limits?`, a: `Smooth to moderately rough terrain. No spinal support, and doesn't accommodate injuries well.`, p: "48" },
+  { s: "move", t: "k", q: `Which drag do you use under fire?`, a: `Clothes drag: grab gear or clothing and pull to safety, staying low. A drag line lets you keep using your weapon.`, p: "49" },
+  { s: "move", t: "k", q: `When can't you use the two-hand arm drag?`, a: `If he has torso, arm, neck or head injuries.`, p: "49" },
+  { s: "move", t: "s", q: `The three litter types?`, l: [`Army litter: standard, most widely used, folds lengthwise`, `Poleless non-rigid: folds small, NO spinal stability`, `Talon collapsible: compact, for tight compartments, collapsible handles`], p: "50" },
+  { s: "move", t: "k", q: `Which direction do you carry a litter?`, a: `Feet first, except head first going uphill or upstairs. With a leg fracture: feet first going up, head first going down.`, p: "52" },
+  { s: "move", t: "s", q: `Litter-carrying rules?`, a: `Move deliberately and gently. Rear bearers time their steps to the front bearers. Keep the litter level, especially over obstacles.`, p: "52" },
+
+  // ---------- Triage ----------
+  { s: "triage", t: "m", q: `The 4 triage categories and tag colors?`, l: [`I – Minimal: GREEN`, `II – Delayed: YELLOW`, `III – Immediate: RED`, `IV – Expectant: BLACK`], p: "52–53" },
+  { s: "triage", t: "k", q: `What does "triage" mean, and when does it stop?`, a: `French for "to sort." It never stops: it's continuous, aiming for the greatest care for the greatest number.`, p: "52" },
+  { s: "triage", t: "m", q: `Minimal (GREEN): who goes here?`, a: `Walking wounded who can care for themselves: minor cuts and abrasions, small-bone fractures, minor burns, sprains, dental pain, frostbite, extremity wounds with bleeding controlled.`, p: "52" },
+  { s: "triage", t: "m", q: `Delayed (YELLOW): who goes here?`, a: `Potentially life-threatening but won't deteriorate much for hours: large soft-tissue wounds, open fractures, severe bleeding controlled by a tourniquet, penetrating abdominal/chest/spine/head injuries not involving the airway, uncomplicated burns under 20% TBSA, severe combat stress.`, p: "52–53" },
+  { s: "triage", t: "m", q: `Immediate (RED): who goes here?`, a: `Any ABC compromise; they die without immediate care: airway obstruction, extreme facial burns, tension pneumothorax, severe respiratory distress, life-threatening bleeding, heatstroke, shock, rapidly worsening responsiveness, abdominal injuries.`, p: "53" },
+  { s: "triage", t: "m", q: `Expectant (BLACK): who goes here?`, a: `Low chance of survival and time-consuming care: cardiac arrest, massive head trauma, 2nd/3rd-degree burns over 70% of the body. Never abandon them: keep them comfortable and re-triage once immediate and delayed patients are treated.`, p: "53" },
+  { s: "triage", t: "k", q: `Severe bleeding now controlled with a tourniquet: which category?`, a: `Delayed (YELLOW).`, p: "52" },
+  { s: "triage", t: "k", q: `Burns: where are the triage lines?`, l: [`Uncomplicated major burns under 20% TBSA: Delayed (yellow)`, `Extreme 2nd/3rd-degree facial burns: Immediate (red)`, `2nd/3rd-degree burns over 70%: Expectant (black)`], p: "53" },
+
+  // ---------- TACEVAC & 9-line ----------
+  { s: "evac", t: "m", q: `The 3 TACEVAC priorities and their time limits?`, l: [`Urgent: within 2 hours, to save life or limb ("Urgent Surgical" if surgery is needed)`, `Priority: within 4 hours, or he'll deteriorate to Urgent`, `Routine: within 24 hours, to complete treatment`], a: `Memory hook: 2-4-24.`, p: "54" },
+  { s: "evac", t: "k", q: `Are TACEVAC priorities the same as triage categories?`, a: `No. They're a separate system that decides who gets evacuated first.`, p: "54" },
+  { s: "evac", t: "m", q: `List the 9 lines in order.`, o: [`Location of pickup site (LZ)`, `Radio frequency and call sign`, `Patients by precedence`, `Special equipment`, `Patients by type (litter / ambulatory)`, `Security of pickup site`, `Method of marking pickup site`, `Patient nationality and status`, `NBC contamination (military) / terrain description (FLM)`], p: "54–55" },
+  { s: "evac", t: "m", q: `9-Line, Line 1?`, a: `Location of the landing zone (LZ) where the casualties will be picked up.`, p: "54" },
+  { s: "evac", t: "m", q: `9-Line, Line 2?`, a: `Radio frequency and call sign the ground unit at the LZ will use.`, p: "54" },
+  { s: "evac", t: "m", q: `9-Line, Line 3?`, a: `Number of patients by precedence (TACEVAC priority). In the FLM example: A = Urgent, B = Priority, C = Routine.`, p: "54, 56" },
+  { s: "evac", t: "m", q: `9-Line, Line 4?`, a: `Special equipment needed, e.g. a hoist if the helicopter can't land.`, p: "54" },
+  { s: "evac", t: "m", q: `9-Line, Line 5?`, a: `Number of patients by carry type: on litters, able to walk, and needing individual help. In the FLM example: A = litter, B = ambulatory, C = escort.`, p: "54, 56" },
+  { s: "evac", t: "m", q: `9-Line, Line 6?`, a: `Security of the pickup site: is the enemy near the LZ? If all your casualties are Routine and the LZ isn't secure, the request may be denied. FLM may drop this line.`, p: "55" },
+  { s: "evac", t: "m", q: `9-Line, Line 7?`, a: `How you'll mark the pickup site; you then ask the pilot to identify the mark.`, p: "55" },
+  { s: "evac", t: "m", q: `9-Line, Line 8 (FLM version)?`, a: `Patient nationality and status: A = Militia, B = Law Enforcement, C = Civilian, D = First Responder.`, p: "55" },
+  { s: "evac", t: "m", q: `9-Line, Line 9: military vs FLM?`, l: [`Military (wartime): NBC contamination`, `FLM: detailed terrain feature description, so the right vehicles and people get sent`], p: "55" },
+  { s: "evac", t: "k", q: `Which lines can you send first?`, a: `Lines 1–5, so the medevac can prepare and get moving. Lines 6–9 can follow once it's underway.`, p: "55" },
+  { s: "evac", t: "k", q: `Decode the FLM sample: "Line 3 A 8, B 2, C 12. Line 5, A 8, B 12, C 2. Line 8 is C 20, D 2."`, l: [`Line 3: 8 Urgent, 2 Priority, 12 Routine`, `Line 5: 8 on litters, 12 ambulatory, 2 needing escorts`, `Line 8: 20 civilians, 2 first responders`], p: "55–56" },
+  { s: "evac", t: "k", q: `How does an FLM-to-FLM radio 9-line open?`, a: `"Med Base, this is CLS 1. A 9-line request follows. How copy?" Then abbreviate heavily using the letter codes.`, p: "56" },
+  { s: "evac", t: "k", q: `Calling 911 instead of an FLM base: what changes?`, a: `Dispatchers likely won't know the 9-line format. Give your name and number first, then location and access route, number of patients and urgency, and their conditions, in plain language. Stay on the line.`, p: "56" },
+
+  // ---------- TCCC card ----------
+  { s: "card", t: "m", q: `When do you fill out the TCCC card?`, a: `Treat first. If you're alone, after all the injured are cared for in Tactical Field Care. If others are available, any capable member can document while you keep treating.`, p: "57" },
+  { s: "card", t: "k", q: `If fire resumes while you're treating, what continues?`, a: `Only life-threatening care; everyone else returns fire. The best medicine in Care Under Fire is fire superiority.`, p: "57" },
+  { s: "card", t: "m", q: `How do you record a tourniquet on the TCCC card?`, a: `Enter the TQ time in its box, then mark an X with "TQ" next to it on the body diagram where the tourniquet is.`, p: "57–58" },
+  { s: "card", t: "m", q: `How do you mark other treatments on the body diagram?`, a: `An X with a short abbreviation next to it, e.g. "ETD" for an Israeli bandage.`, p: "58" },
+  { s: "card", t: "k", q: `The mechanism-of-injury options on the card?`, l: [`GSW: gunshot wound`, `BLAST: hit by any part of an explosion`, `MVA: motor vehicle accident`, `Other: keep it brief`], p: "58" },
+  { s: "card", t: "k", q: `What does the back of the card start with?`, a: `ABCs (Airway, Breathing, Circulation). Circle the status.`, p: "58" },
+  { s: "card", t: "m", q: `Which sections of the card are Medic 3 only?`, a: `Fluids (IV needs a license) and every drug except the pill pack. As a Medic 1, you only mark whether the pill pack was taken.`, p: "58" },
+  { s: "card", t: "m", q: `Whose name goes on the card?`, a: `The person who provided the initial care, not whoever filled out the card.`, p: "58" },
+  { s: "card", t: "s", q: `What about the DTG field?`, a: `Not used by FLM.`, p: "57" },
+  { s: "card", t: "k", q: `Where does the card go?`, a: `Attached to the patient somewhere highly visible, secured so it won't fall off when he's moved.`, p: "57" },
+  { s: "card", t: "k", q: `How many vital-sign entries does the card's table hold?`, a: `The patient's status at four different times.`, p: "58" },
+  { s: "card", t: "k", q: `Why does the TCCC card matter?`, a: `It lets patients be monitored and prepared for evacuation. Sending a casualty without one delays his care.`, p: "57" },
+
+  // ---------- Gear ----------
+  { s: "gear", t: "k", q: `Medic 1 kit items you carry 3 of?`, l: [`Israeli / ETD bandage`, `Compression gauze`, `Combat Gauze`, `Triangular bandage`, `Burn cravat`, `Water Jel burn gel (1/8 oz)`, `Chest seal`, `Decompression needle`, `CAT tourniquet`], p: "59" },
+  { s: "gear", t: "k", q: `The rest of the Medic 1 kit?`, l: [`2 abdominal dressings (8" × 12" ETD)`, `Trauma shears and a strap cutter`, `SAM splint`, `NPAs: one 22FR, one 26FR`, `Tape: ½" and 1" rolls`, `12 each: 4×4 gauze pads, pairs of gloves, alcohol pads`], p: "59" }
+];
+
+// ---------- State ----------
+const CARDS = [];
+(function () {
+  const n = {};
+  RAW.forEach(c => { n[c.s] = (n[c.s] || 0) + 1; CARDS.push(Object.assign({ id: c.s + "-" + n[c.s] }, c)); });
+})();
+const BY_ID = Object.fromEntries(CARDS.map(c => [c.id, c]));
+const TIER = { m: "Must know", k: "Know", s: "Skim" };
+const KEY = "medic1-7day-v1";
+
+let store = { cards: {}, must: false, classDate: null };
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) {
+    const v = JSON.parse(raw);
+    if (v && typeof v === "object") store = { cards: v.cards || {}, must: !!v.must, classDate: typeof v.classDate === "string" ? v.classDate : null };
+  }
+} catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+
+const status = id => (store.cards[id] || {}).r;
+const idsFor = (secs, forceMust) => CARDS
+  .filter(c => secs === "all" || secs.includes(c.s))
+  .filter(c => !(forceMust || store.must) || c.t === "m")
+  .map(c => c.id);
+const missedIds = () => CARDS.filter(c => status(c.id) === "miss" && (!store.must || c.t === "m")).map(c => c.id);
+
+// ---------- Dates ----------
+function localISO(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function parseISO(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+function startOfToday() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+function daysUntil(d) { return Math.round((d - startOfToday()) / 86400000); }
+const fmt = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+
+// Where today falls relative to the class date.
+function todayState() {
+  const cls = parseISO(store.classDate);
+  if (!cls) return { mode: "unset", idx: -1 };
+  const dtc = daysUntil(cls);
+  if (dtc > 7) return { mode: "early", idx: -1, cls, dtc };
+  if (dtc >= 1) return { mode: "plan", idx: 7 - dtc, cls, dtc };
+  if (dtc >= -1) return { mode: "class", idx: -1, cls, dtc };
+  return { mode: "over", idx: -1, cls, dtc };
+}
+function shuffle(a) {
+  const b = a.slice();
+  for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+  return b;
+}
+// Missed first, then unseen, then ones you already know.
+function orderDeck(ids) {
+  const miss = [], fresh = [], known = [];
+  ids.forEach(id => { const s = status(id); (s === "miss" ? miss : s === "got" ? known : fresh).push(id); });
+  return shuffle(miss).concat(shuffle(fresh), shuffle(known));
+}
+
+// ---------- DOM helpers ----------
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    if (k === "class") el.className = attrs[k];
+    else if (k === "text") el.textContent = attrs[k];
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), attrs[k]);
+    else if (attrs[k] === true) el.setAttribute(k, "");
+    else if (attrs[k] !== false && attrs[k] != null) el.setAttribute(k, attrs[k]);
+  }
+  kids.flat().forEach(k => { if (k != null) el.append(k.nodeType ? k : document.createTextNode(k)); });
+  return el;
+}
+const $ = id => document.getElementById(id);
+function show(view) {
+  ["home", "study", "done"].forEach(v => { $(v).hidden = v !== view; });
+  window.scrollTo(0, 0);
+}
+
+// ---------- Home ----------
+function countsFor(ids) {
+  let got = 0, miss = 0;
+  ids.forEach(id => { const s = status(id); if (s === "got") got++; else if (s === "miss") miss++; });
+  return { total: ids.length, got, miss };
+}
+function bar(c) {
+  const pct = n => c.total ? (100 * n / c.total).toFixed(1) + "%" : "0%";
+  return h("span", { class: "bar", "aria-hidden": "true" },
+    h("i", { class: "k", style: "width:" + pct(c.got) }),
+    h("i", { class: "m", style: "width:" + pct(c.miss) }));
+}
+
+function dateForm(editing) {
+  const input = h("input", { type: "date", id: "class-date", value: store.classDate || "" });
+  const err = h("p", { class: "err", role: "alert", hidden: true });
+  const submit = () => {
+    if (!parseISO(input.value)) { err.textContent = "Pick a date first."; err.hidden = false; return; }
+    store.classDate = input.value; save(); renderHome();
+  };
+  input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submit(); } });
+  return h("div", { class: "date-form" },
+    h("label", { for: "class-date", text: "First day of class" }),
+    h("div", { class: "date-row" }, input,
+      h("button", { type: "button", class: "btn", onclick: submit }, editing ? "Save date" : "Start my plan"),
+      editing ? h("button", { type: "button", class: "btn ghost", onclick: renderHome }, "Cancel") : null),
+    err);
+}
+function classLine(cls) {
+  const line = h("p", { class: "class-line" },
+    h("span", null, "Class starts ", h("b", { text: fmt(cls) })));
+  line.append(h("button", { type: "button", class: "linkbtn", onclick: () => line.replaceWith(dateForm(true)) }, "Change date"));
+  return line;
+}
+function deckButtons(label, title, ids) {
+  const missed = missedIds();
+  return h("div", { class: "btn-row" },
+    h("button", { type: "button", class: "btn", disabled: !ids.length, onclick: () => startDeck(title, ids) }, label),
+    missed.length ? h("button", { type: "button", class: "btn ghost", onclick: () => startDeck("Missed cards", missed) }, "Warm up: " + missed.length + " missed") : null);
+}
+function dayDeck(d) { return idsFor(d.sections, d.mustOnly); }
+function secNames(d) {
+  if (d.sections !== "all") return d.sections.map(s => SECTIONS[s].name).join(", ");
+  return d.mustOnly ? "Must-know cards from all 14 sections" : "All 14 sections";
+}
+
+function renderToday(st) {
+  const panel = $("today");
+  if (st.mode === "unset") {
+    panel.replaceChildren(
+      h("p", { class: "eyebrow", text: "Set up your week" }),
+      h("h2", { text: "When does your class start?" }),
+      h("p", { class: "muted", text: "Your 7-day plan counts back from that date: Day 1 is a week out, Day 7 is the day before." }),
+      dateForm(false),
+      h("button", { type: "button", class: "linkbtn", style: "align-self:flex-start",
+        onclick: () => { store.classDate = localISO(addDays(startOfToday(), 7)); save(); renderHome(); } },
+        "No date yet? Start Day 1 today"));
+    return;
+  }
+  if (st.mode === "early") {
+    const ids = dayDeck(PLAN[0]);
+    panel.replaceChildren(
+      h("p", { class: "eyebrow", text: "Day 1 is " + fmt(addDays(st.cls, -7)) }),
+      h("h2", { text: "Get a head start" }),
+      h("p", { class: "muted", text: "Class is " + st.dtc + " days away. Your plan begins a week out; until then, read the supplement or study any section below." }),
+      deckButtons("Start Day 1 early", PLAN[0].title, ids),
+      classLine(st.cls));
+    return;
+  }
+  if (st.mode === "class") {
+    const ids = idsFor("all", true);
+    panel.replaceChildren(
+      h("p", { class: "eyebrow", text: "Class time · quick review" }),
+      h("h2", { text: "One pass through the must-know cards" }),
+      h("p", { class: "muted", text: "Run them once before you go. Bring your Qualification Card, Skills Assessment Sheets and a pen." }),
+      deckButtons("Start must-know review", "Must-know review", ids),
+      classLine(st.cls));
+    return;
+  }
+  if (st.mode === "over") {
+    panel.replaceChildren(
+      h("p", { class: "eyebrow", text: "Class finished " + fmt(st.cls) }),
+      h("h2", { text: "Training for another event?" }),
+      h("p", { class: "muted", text: "Set your next class date to start a new 7-day plan. Your card marks carry over; reset them at the bottom for a clean start." }),
+      dateForm(true));
+    return;
+  }
+  const d = PLAN[st.idx];
+  const ids = dayDeck(d);
+  panel.replaceChildren(...[
+    h("p", { class: "eyebrow", text: "Today · Day " + (st.idx + 1) + " of 7" }),
+    h("h2", { text: d.title }),
+    d.note ? h("p", { text: d.note }) : null,
+    h("p", { class: "muted", text: secNames(d) + " · " + ids.length + " cards" }),
+    deckButtons("Start today's set", d.title, ids),
+    classLine(st.cls)].filter(Boolean));
+}
+
+function renderHome() {
+  const st = todayState();
+  const cd = $("countdown");
+  cd.hidden = !(st.dtc >= -1);
+  if (!cd.hidden) cd.textContent = st.dtc > 1 ? st.dtc + " days to class" : st.dtc === 1 ? "Class tomorrow" : "Class time";
+
+  const all = idsFor("all");
+  const c = countsFor(all);
+  $("stats").replaceChildren(
+    h("span", null, h("b", { text: String(c.total) }), store.must ? " must-know cards" : " cards"),
+    h("span", null, h("b", { text: String(c.got) }), " known"),
+    h("span", null, h("b", { text: String(c.miss) }), " missed"),
+    h("span", null, h("b", { text: String(c.total - c.got - c.miss) }), " not seen"));
+
+  renderToday(st);
+
+  // Filter
+  $("f-all").setAttribute("aria-pressed", String(!store.must));
+  $("f-must").setAttribute("aria-pressed", String(store.must));
+
+  // Plan
+  const plan = PLAN.map((d, i) => {
+    const ids = dayDeck(d);
+    const label = "Day " + (i + 1);
+    const head = h("div", { class: "day-head" },
+      h("div", { class: "label" },
+        h("span", { class: "d", text: label }),
+        st.cls ? h("span", { class: "dt", text: fmt(addDays(st.cls, i - 7)) }) : null,
+        h("span", { class: "t", text: d.title })),
+      h("button", { type: "button", class: "linkbtn", disabled: !ids.length, onclick: () => startDeck(d.title, ids), "aria-label": "Study all of " + label }, "Study day"));
+    let rows;
+    if (d.sections === "all") {
+      const cc = countsFor(ids);
+      const name = d.mustOnly ? "Must-know cards" : "All cards";
+      rows = [h("button", { type: "button", class: "row", disabled: !ids.length, onclick: () => startDeck(name, ids) },
+        h("span", null, h("span", { class: "name", text: name }), " ", h("span", { class: "pg", text: d.mustOnly ? "· all sections" : "· missed first" })),
+        h("span", { class: "count", text: cc.got + "/" + cc.total }), bar(cc))];
+    } else {
+      rows = d.sections.map(s => {
+        const sids = idsFor([s]);
+        const cc = countsFor(sids);
+        return h("button", { type: "button", class: "row", disabled: !sids.length, onclick: () => startDeck(SECTIONS[s].name, sids) },
+          h("span", null, h("span", { class: "name", text: SECTIONS[s].name }), " ", h("span", { class: "pg", text: "· " + SECTIONS[s].pages })),
+          h("span", { class: "count", text: sids.length ? cc.got + "/" + cc.total : "none" }), bar(cc));
+      });
+    }
+    return h("div", { class: "day" + (i === st.idx ? " is-today" : "") }, head,
+      d.note && i === 0 ? h("p", { class: "day-note", text: d.note }) : null,
+      h("div", { class: "rows" }, rows));
+  });
+  $("plan").replaceChildren(...plan);
+}
+
+$("f-all").addEventListener("click", () => { store.must = false; save(); renderHome(); });
+$("f-must").addEventListener("click", () => { store.must = true; save(); renderHome(); });
+$("reset").addEventListener("click", showResetConfirm);
+function showResetConfirm() {
+  $("reset-area").replaceChildren(h("div", { class: "reset-confirm" },
+    h("span", { text: "Clear every card's mark?" }),
+    h("button", { type: "button", class: "btn miss", onclick: () => { store.cards = {}; save(); restoreReset(); renderHome(); } }, "Yes, reset"),
+    h("button", { type: "button", class: "btn ghost", onclick: restoreReset }, "Cancel")));
+}
+function restoreReset() {
+  $("reset-area").replaceChildren(h("button", { type: "button", class: "linkbtn", id: "reset", onclick: showResetConfirm }, "Reset all progress"));
+}
+
+// ---------- Study ----------
+let session = null;
+function startDeck(name, ids) {
+  if (!ids.length) return;
+  const queue = orderDeck(ids);
+  session = { name, queue, total: queue.length, cleared: 0, first: {}, revealed: false };
+  $("deck-name").textContent = name;
+  show("study");
+  renderCard();
+  $("card").focus({ preventScroll: true });
+}
+function renderCard() {
+  const c = BY_ID[session.queue[0]];
+  const again = c.id in session.first;
+  const chips = [
+    h("span", { class: "chip t-" + c.t, text: TIER[c.t] }),
+    h("span", { class: "chip", text: SECTIONS[c.s].name })];
+  if (again) chips.push(h("span", { class: "chip again", text: "Again" }));
+  $("chips").replaceChildren(...chips);
+  $("q").textContent = c.q;
+  const ans = $("ans");
+  ans.replaceChildren();
+  if (c.a) ans.append(h("p", { text: c.a }));
+  if (c.l) ans.append(h("ul", null, c.l.map(x => h("li", { text: x }))));
+  if (c.o) ans.append(h("ol", null, c.o.map(x => h("li", { text: x }))));
+  ans.append(h("p", { class: "src", text: "Supplement p. " + c.p }));
+  ans.hidden = !session.revealed;
+  $("hint").hidden = session.revealed;
+  $("counter").textContent = session.cleared + " of " + session.total + " cleared" + (session.queue.length > session.total - session.cleared ? " · " + (session.queue.length - (session.total - session.cleared)) + " repeats queued" : "");
+  $("prog").style.width = (100 * session.cleared / session.total) + "%";
+  renderActions();
+}
+function renderActions() {
+  const a = $("actions");
+  if (!session.revealed) {
+    a.replaceChildren(
+      h("button", { type: "button", class: "btn wide", onclick: reveal }, "Show answer"),
+      h("p", { class: "keys", text: "Space: show answer · Esc: back to plan" }));
+  } else {
+    a.replaceChildren(
+      h("button", { type: "button", class: "btn miss", onclick: () => mark(false) }, "Missed it"),
+      h("button", { type: "button", class: "btn got", onclick: () => mark(true) }, "Got it"),
+      h("p", { class: "keys", text: "1 or ←: missed · 2 or →: got it" }));
+  }
+}
+function reveal() {
+  if (!session || session.revealed) return;
+  session.revealed = true;
+  $("ans").hidden = false;
+  $("hint").hidden = true;
+  renderActions();
+}
+function mark(got) {
+  const id = session.queue.shift();
+  if (!(id in session.first)) {
+    session.first[id] = got;
+    store.cards[id] = { r: got ? "got" : "miss" };
+    save();
+  }
+  if (got) session.cleared++;
+  else session.queue.splice(Math.min(3, session.queue.length), 0, id);
+  if (!session.queue.length) return finish();
+  session.revealed = false;
+  renderCard();
+  window.scrollTo(0, 0);
+}
+function finish() {
+  const ids = Object.keys(session.first);
+  const firstMiss = ids.filter(id => !session.first[id]);
+  const right = ids.length - firstMiss.length;
+  const box = $("done-box");
+  box.replaceChildren(
+    h("p", { class: "eyebrow", text: "Round done · " + session.name }),
+    h("p", { class: "big", text: right + " / " + ids.length }),
+    h("p", { text: firstMiss.length ? "right on the first try. The " + firstMiss.length + " you missed are in your missed pile and will come up first next time." : "right on the first try. Clean round." }),
+    h("div", { class: "btn-row" },
+      firstMiss.length ? h("button", { type: "button", class: "btn", onclick: () => startDeck("Missed this round", firstMiss) }, "Drill the " + firstMiss.length + " missed") : null,
+      h("button", { type: "button", class: "btn ghost", onclick: goHome }, "Back to plan")));
+  session = null;
+  show("done");
+}
+function goHome() { session = null; renderHome(); show("home"); }
+
+$("card").addEventListener("click", reveal);
+$("back").addEventListener("click", goHome);
+document.addEventListener("keydown", e => {
+  if ($("study").hidden || !session) return;
+  if (e.target.tagName === "BUTTON" && (e.key === " " || e.key === "Enter")) return;
+  if (e.key === "Escape") { goHome(); return; }
+  if (!session.revealed && (e.key === " " || e.key === "Enter")) { e.preventDefault(); reveal(); return; }
+  if (session.revealed) {
+    if (e.key === "1" || e.key === "ArrowLeft") mark(false);
+    else if (e.key === "2" || e.key === "ArrowRight") mark(true);
+  }
+});
+
+// ---------- Install as an app ----------
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const INSTALL_KEY = KEY + "-install-dismissed";
+let installPrompt = null;
+
+function renderInstall() {
+  const box = $("install");
+  let dismissed = false;
+  try { dismissed = localStorage.getItem(INSTALL_KEY) === "1"; } catch (e) {}
+  if (isStandalone || dismissed) { box.hidden = true; return; }
+  const how = installPrompt
+    ? "Install it to get the Medic 1 icon on your home screen. It opens full screen and works without signal."
+    : isIOS
+      ? "Tap the Share button, then “Add to Home Screen.” It opens full screen and works without signal."
+      : "In your browser menu, choose “Install app” or “Add to Home screen.” It opens full screen and works without signal.";
+  box.replaceChildren(
+    h("img", { src: "icons/apple-touch-icon.png", alt: "" }),
+    h("div", { class: "body" },
+      h("p", { class: "eyebrow", text: "Put it on your home screen" }),
+      h("p", { text: how }),
+      h("div", { class: "btn-row" },
+        installPrompt ? h("button", { type: "button", class: "btn", onclick: async () => {
+          const p = installPrompt; installPrompt = null;
+          try { p.prompt(); await p.userChoice; } catch (e) {}
+          renderInstall();
+        } }, "Install app") : null,
+        h("button", { type: "button", class: "btn ghost", onclick: () => {
+          try { localStorage.setItem(INSTALL_KEY, "1"); } catch (e) {}
+          box.hidden = true;
+        } }, "Not now"))));
+  box.hidden = false;
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; renderInstall(); });
+window.addEventListener("appinstalled", () => { installPrompt = null; $("install").hidden = true; });
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+
+renderInstall();
+renderHome();
+</script>
+</body>
+</html>
